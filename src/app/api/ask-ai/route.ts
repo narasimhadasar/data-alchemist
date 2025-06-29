@@ -7,7 +7,7 @@ export async function POST(req: NextRequest) {
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
+        Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
@@ -21,8 +21,8 @@ export async function POST(req: NextRequest) {
     const result = await response.json();
     const content = result?.choices?.[0]?.message?.content;
 
-    console.log(" Full OpenRouter response:", JSON.stringify(result, null, 2));
-    console.log(" OpenRouter Raw Content:", content);
+    console.log("Full OpenRouter response:", JSON.stringify(result, null, 2));
+    console.log("OpenRouter Raw Content:", content);
 
     let parsedData: unknown[] = [];
 
@@ -34,22 +34,23 @@ export async function POST(req: NextRequest) {
 
       parsedData = JSON.parse(jsonString || "[]");
 
-      // Ensure it's an array
       if (!Array.isArray(parsedData)) {
         parsedData = [{ error: "Response is not a valid array. Try a different prompt." }];
       }
     } catch (err) {
-      console.error(" Failed to parse content as JSON:", err);
+      console.error("Failed to parse content as JSON:", err);
       parsedData = [{ error: "AI response was not in valid JSON format." }];
     }
 
     return NextResponse.json({ data: parsedData });
   } catch (error: unknown) {
     console.error("OpenRouter Error:", error);
-    const message =
-      error instanceof Error ? error.message : "An unexpected error occurred";
     return NextResponse.json(
-      { error: "AI processing failed", details: error.message },
+      {
+        error: "AI processing failed",
+        details:
+          error instanceof Error ? error.message : "An unexpected error occurred",
+      },
       { status: 500 }
     );
   }
