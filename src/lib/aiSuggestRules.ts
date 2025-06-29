@@ -18,7 +18,7 @@ export async function fetchRuleSuggestions(): Promise<string[]> {
     }
 
     return json.suggestions || [];
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("❌ fetchRuleSuggestions failed:", err.message);
     return [];
   }
