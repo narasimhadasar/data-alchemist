@@ -66,6 +66,7 @@ If the query is unclear or not about clients, workers, or tasks, return this JSO
         setError(json.error || "Unknown error");
       }
     } catch (err) {
+      console.error("AI fetch error:", err);
       setError("Failed to reach the AI service.");
     } finally {
       setLoading(false);
