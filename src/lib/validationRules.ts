@@ -82,7 +82,7 @@ export const defaultRules: Rule[] = [
     field: "RequestedTaskIDs",
     validate: (value, row, data) => {
       const ids = String(value || "").split(/[,\s]+/).filter(Boolean);
-      const known = new Set(data.tasks.map((t: any) => String(t.TaskID)));
+      const known = new Set(data.tasks.map((t: unknown) => String(t.TaskID)));
       const invalid = ids.find((id: string) => !known.has(id));
       return invalid ? `Unknown TaskID: ${invalid}` : null;
     },
@@ -99,7 +99,7 @@ export const defaultRules: Rule[] = [
         .split(/[,\s]+/)
         .map((s) => s.toLowerCase());
       const allSkills = new Set(
-        data.workers.map((w: any) => w.Skill?.toLowerCase())
+        data.workers.map((w: unknown) => w.Skill?.toLowerCase())
       );
       const missing = skills.find((s: string) => !allSkills.has(s));
       return missing ? `Missing skill coverage: ${missing}` : null;
