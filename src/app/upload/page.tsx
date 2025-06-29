@@ -23,7 +23,7 @@ import {
 type Row = Record<string, unknown>;
 
 export default function UploadPage() {
-  const [files, setFiles] = useState<File[]>([]);
+  const [, setFiles] = useState<File[]>([]);
   const [validFiles, setValidFiles] = useState<string[]>([]);
   const [errors, setErrors] = useState<string[]>([]);
   const { data, setData, setValid, valid } = useDataStore();
