@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
     console.log(" Full OpenRouter response:", JSON.stringify(result, null, 2));
     console.log(" OpenRouter Raw Content:", content);
 
-    let parsedData: any[] = [];
+    let parsedData: unknown[] = [];
 
     try {
       // Extract anything inside a ```json ... ``` block OR plain array
@@ -44,8 +44,10 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({ data: parsedData });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("OpenRouter Error:", error);
+    const message =
+      error instanceof Error ? error.message : "An unexpected error occurred";
     return NextResponse.json(
       { error: "AI processing failed", details: error.message },
       { status: 500 }
