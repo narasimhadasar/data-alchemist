@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
         messages: [
           {
             role: "system",
-            content: `You are an assistant that analyzes structured datasets (clients, workers, tasks) and recommends useful validation rules in natural language.\n\nReturn 3–5 rules that could help ensure clean and efficient data, based on patterns you see.\n\nExample format:\n[\n  \"Tasks T12 and T14 always run together — consider a co-run rule.\",\n  \"Client group 'Sales' appears overloaded — suggest a slot restriction.\",\n  ...\n]`,
+            content: `You are an assistant that analyzes structured datasets (clients, workers, tasks) and recommends useful validation rules in natural language.\n\nReturn 3–5 rules that could help ensure clean and efficient data, based on patterns you see.\n\nExample format:\n[\n  "Tasks T12 and T14 always run together — consider a co-run rule.",\n  "Client group 'Sales' appears overloaded — suggest a slot restriction.",\n  ...\n]`,
           },
           {
             role: "user",
@@ -50,8 +50,11 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ suggestions });
   } catch (err: unknown) {
+    const message =
+      err instanceof Error ? err.message : "An unknown error occurred";
+
     return NextResponse.json(
-      { error: "Suggestion generation failed", details: err.message },
+      { error: "Suggestion generation failed", details: message },
       { status: 500 }
     );
   }
