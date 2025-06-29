@@ -1,79 +1,155 @@
-"use client";
+import type { Rule } from "./dataStore";
+import type { Row } from "./types";
 
-import { useEffect, useRef } from "react";
-import Link from "next/link";
-import { useDataStore } from "@/lib/dataStore";
-import RuleInput from "@/components/RuleInput";
-import { defaultRules } from "@/lib/validationRules";
-
-export default function RuleEditorPage() {
-  const rules = useDataStore((s) => s.rules);
-  const setRules = useDataStore((s) => s.setRules);
-  const revalidate = useDataStore((s) => s.revalidate);
-  const errors = useDataStore((s) => s.errors);
-
-  const validationRef = useRef<HTMLDivElement>(null);
-
-  // Initialize default rules if empty
-  useEffect(() => {
-    if (rules.length === 0) {
-      setRules(defaultRules);
-    }
-  }, [rules.length, setRules]);
-
-  const handleRevalidate = () => {
-    revalidate();
-    setTimeout(() => {
-      validationRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, 100);
-  };
-
-  const sortedErrors = [...errors].sort(
-    (a, b) => (b.weight ?? 1) - (a.weight ?? 1)
-  );
-
-  return (
-    <div className="p-6 space-y-6">
-      {/* Header with title and button */}
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold"> Rule Configuration</h1>
-        <Link href="/grid">
-          <button className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-             Go to Grid Page
-          </button>
-        </Link>
-      </div>
-
-      <RuleInput />
-
-      <button
-        onClick={handleRevalidate}
-        className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-      >
-        Re-Validate Data
-      </button>
-
-      <div ref={validationRef}>
-        {sortedErrors.length > 0 ? (
-          <div className="bg-red-50 border border-red-300 text-red-800 p-4 rounded-md mt-6">
-            <h2 className="font-semibold mb-2">⚠ Validation Issues</h2>
-            <ul className="list-disc pl-5 text-sm space-y-1">
-              {sortedErrors.map((err, idx) => (
-                <li key={idx}>
-                  <strong>{err.entity}</strong> [Row {err.row + 1}] <em>{err.field}</em>: {err.message}
-                  {typeof err.weight !== "undefined" && (
-                    <span className="text-xs text-gray-600 ml-2">
-                      (Weight: {err.weight})
-                    </span>
-                  )}
-                </li>
-              ))}
-            </ul>
-          </div>
-        ) : (
-          <p className="text-sm text-green-600 mt-4">✅ No validation errors</p>
-        )}
-      </div>
-    </div>
-  );
+interface FullData {
+  clients: Row[];
+  workers: Row[];
+  tasks: Row[];
 }
+
+export const defaultRules: Rule[] = [
+  {
+    id: "client-priority-range",
+    entity: "clients",
+    field: "PriorityLevel",
+    validate: (value) => {
+      const num = Number(value);
+      return isNaN(num) || num < 1 || num > 5
+        ? "PriorityLevel must be between 1 and 5"
+        : null;
+    },
+    message: "PriorityLevel must be between 1 and 5",
+    active: true,
+    weight: 1,
+  },
+  {
+    id: "task-duration-positive",
+    entity: "tasks",
+    field: "Duration",
+    validate: (value) => {
+      const num = Number(value);
+      return isNaN(num) || num < 1 ? "Duration must be a positive number" : null;
+    },
+    message: "Duration must be a positive number",
+    active: true,
+    weight: 1,
+  },
+  {
+    id: "worker-maxload-valid",
+    entity: "workers",
+    field: "MaxLoadPerPhase",
+    validate: (value) => {
+      const num = Number(value);
+      return isNaN(num) || num < 1
+        ? "MaxLoadPerPhase must be a positive number"
+        : null;
+    },
+    message: "MaxLoadPerPhase must be valid",
+    active: true,
+    weight: 1,
+  },
+  {
+    id: "client-json-valid",
+    entity: "clients",
+    field: "AttributesJSON",
+    validate: (value) => {
+      try {
+        if (!value) return null;
+        const jsonString = typeof value === "string" ? value : JSON.stringify(value);
+        JSON.parse(jsonString);
+        return null;
+      } catch {
+        return "Invalid JSON";
+      }
+    },
+    message: "AttributesJSON must be valid JSON",
+    active: true,
+    weight: 1,
+  },
+  {
+    id: "worker-slots-valid",
+    entity: "workers",
+    field: "AvailableSlots",
+    validate: (value) => {
+      try {
+        const jsonString = typeof value === "string" ? value : JSON.stringify(value ?? []);
+        const parsed = JSON.parse(jsonString);
+        return !Array.isArray(parsed) || parsed.some((x) => typeof x !== "number")
+          ? "AvailableSlots must be an array of numbers"
+          : null;
+      } catch {
+        return "Invalid format for AvailableSlots";
+      }
+    },
+    message: "AvailableSlots must be an array of numbers",
+    active: true,
+    weight: 1,
+  },
+  {
+    id: "client-task-reference",
+    entity: "clients",
+    field: "RequestedTaskIDs",
+    validate: (value, _row, data: FullData) => {
+      const ids = String(value || "").split(/[,\s]+/).filter(Boolean);
+      const known = new Set(data.tasks.map((t) => String(t.TaskID)));
+      const invalid = ids.find((id: string) => !known.has(id));
+      return invalid ? `Unknown TaskID: ${invalid}` : null;
+    },
+    message: "RequestedTaskIDs must refer to valid tasks",
+    active: true,
+    weight: 2,
+  },
+  {
+    id: "task-skill-covered",
+    entity: "tasks",
+    field: "RequiredSkills",
+    validate: (value, _row, data: FullData) => {
+      const skills = String(value || "")
+        .split(/[,\s]+/)
+        .map((s) => s.toLowerCase());
+      const allSkills = new Set(
+        data.workers.map((w) => String(w.Skill || "").toLowerCase())
+      );
+      const missing = skills.find((s: string) => !allSkills.has(s));
+      return missing ? `Missing skill coverage: ${missing}` : null;
+    },
+    message: "Each RequiredSkill must be covered by at least one worker",
+    active: true,
+    weight: 2,
+  },
+  {
+    id: "task-co-run-cycle",
+    entity: "tasks",
+    field: "CoRunTaskIDs",
+    validate: (_value, row: Row, data: FullData) => {
+      const graph = new Map<string, string[]>();
+      for (const task of data.tasks) {
+        const id = String(task.TaskID);
+        const co = String(task.CoRunTaskIDs || "")
+          .split(/[,\s]+/)
+          .filter(Boolean);
+        graph.set(id, co);
+      }
+
+      const visited = new Set<string>();
+      const stack = new Set<string>();
+
+      const dfs = (node: string): boolean => {
+        if (stack.has(node)) return true;
+        if (visited.has(node)) return false;
+        visited.add(node);
+        stack.add(node);
+        for (const neighbor of graph.get(node) || []) {
+          if (dfs(neighbor)) return true;
+        }
+        stack.delete(node);
+        return false;
+      };
+
+      return dfs(String(row.TaskID)) ? "Circular co-run detected" : null;
+    },
+    message: "Tasks should not form a circular co-run chain",
+    active: true,
+    weight: 3,
+  },
+];
