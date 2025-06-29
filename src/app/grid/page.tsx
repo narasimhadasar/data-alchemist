@@ -29,7 +29,7 @@ export default function GridPage() {
 
   const handleEdit =
     (section: keyof typeof data) =>
-    (rowIndex: number, field: string, value: any) => {
+    (rowIndex: number, field: string, value: unknown) => {
       const updated = [...data[section]];
       updated[rowIndex][field] = value;
       setData(section, updated);
