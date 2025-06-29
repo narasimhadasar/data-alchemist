@@ -6,7 +6,7 @@ import type { OpenAIStreamPayload } from "@/lib/openai";
 
 export default function NaturalQuery() {
   const [query, setQuery] = useState("");
-  const [result, setResult] = useState<any[]>([]);
+  const [result, setResult] = useState<unknown[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { data, setData } = useDataStore();
