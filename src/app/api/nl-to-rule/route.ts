@@ -1,4 +1,3 @@
-// src/app/api/nl-to-rule/route.ts
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
@@ -15,7 +14,7 @@ export async function POST(req: NextRequest) {
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY || ""}`,
+        Authorization: `Bearer ${process.env.OPENROUTER_API_KEY || ""}`,
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
@@ -62,8 +61,9 @@ Return a JSON object with the following keys:
 
     return NextResponse.json({ rule });
   } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "An unexpected error occurred";
     return NextResponse.json(
-      { error: "Rule conversion failed", details: err.message },
+      { error: "Rule conversion failed", details: message },
       { status: 500 }
     );
   }
