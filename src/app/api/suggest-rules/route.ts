@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({ suggestions });
-  } catch (err: any) {
+  } catch (err: unknown) {
     return NextResponse.json(
       { error: "Suggestion generation failed", details: err.message },
       { status: 500 }
