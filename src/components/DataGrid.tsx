@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, ReactNode } from "react";
 
 type DataGridProps = {
   data: Record<string, unknown>[];
@@ -40,7 +40,7 @@ export default function DataGrid({ data, onEdit }: DataGridProps) {
                     <input
                       type="text"
                       className="w-full p-1 border border-blue-500 rounded"
-                      defaultValue={row[field]}
+                      defaultValue={String(row[field] ?? "")}
                       autoFocus
                       onBlur={(e) => {
                         onEdit(rowIndex, field, e.target.value);
@@ -54,7 +54,7 @@ export default function DataGrid({ data, onEdit }: DataGridProps) {
                       }}
                     />
                   ) : (
-                    row[field]
+                    row[field] as ReactNode
                   )}
                 </td>
               ))}
