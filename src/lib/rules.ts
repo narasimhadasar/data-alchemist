@@ -3,7 +3,11 @@ export type Rule = {
   entity: "clients" | "workers" | "tasks";
   field: string;
   message: string;
-  test: (value: unknown, row: Record<string, unknown>, all: Record<string, unknown>[]) => boolean;
+  test: (
+    value: unknown,
+    row: Record<string, unknown>,
+    all: Record<string, unknown>[]
+  ) => boolean;
   severity?: "error" | "warning";
 };
 
@@ -19,10 +23,14 @@ export const defaultRules: Rule[] = [
     id: "worker-slots-maxload",
     entity: "workers",
     field: "MaxLoadPerPhase",
-    message: "Slots < MaxLoad",
+    message: "AvailableSlots must contain enough slots for MaxLoadPerPhase",
     test: (val, row) => {
       try {
-        const slots = JSON.parse(row.AvailableSlots || "[]");
+        const slotString = row.AvailableSlots;
+        const parsed =
+          typeof slotString === "string" ? slotString : JSON.stringify(slotString);
+
+        const slots = JSON.parse(parsed);
         return Array.isArray(slots) && slots.length >= Number(val);
       } catch {
         return false;
