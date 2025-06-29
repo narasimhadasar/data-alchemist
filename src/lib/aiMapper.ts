@@ -30,11 +30,11 @@ export const taskHeaderMap: Record<string, string> = {
 };
 
 export function remapHeaders(
-  rows: Record<string, any>[],
+  rows: Record<string, unknown>[],
   map: Record<string, string>
-): Record<string, any>[] {
+): Record<string, unknown>[] {
   return rows.map((row) => {
-    const remapped: Record<string, any> = {};
+    const remapped: Record<string, unknown> = {};
     for (const [key, value] of Object.entries(row)) {
       const normalizedKey = key.trim().toLowerCase();
       const newKey = map[normalizedKey] || key;
