@@ -1,10 +1,13 @@
-// src/components/RulePrioritization.tsx
 "use client";
 
 import { useDataStore } from "@/lib/dataStore";
 import { Rule } from "@/lib/dataStore";
 import { useState, useEffect } from "react";
-import { DndContext, closestCenter } from "@dnd-kit/core";
+import {
+  DndContext,
+  closestCenter,
+  type DragEndEvent,
+} from "@dnd-kit/core";
 import {
   arrayMove,
   SortableContext,
@@ -44,21 +47,23 @@ export default function RulePrioritization() {
     setOrderedIds(rules.map((r) => r.id));
   }, [rules]);
 
-  const handleDragEnd = (event: unknown) => {
+  const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
-    if (active.id !== over.id) {
-      const oldIndex = orderedIds.indexOf(active.id);
-      const newIndex = orderedIds.indexOf(over.id);
-      const newIds = arrayMove(orderedIds, oldIndex, newIndex);
-      setOrderedIds(newIds);
-      const newOrderedRules = newIds.map((id) => rules.find((r) => r.id === id)!);
-      setRules(newOrderedRules);
-    }
+
+    if (!over || active.id === over.id) return;
+
+    const oldIndex = orderedIds.indexOf(active.id as string);
+    const newIndex = orderedIds.indexOf(over.id as string);
+    const newIds = arrayMove(orderedIds, oldIndex, newIndex);
+    setOrderedIds(newIds);
+
+    const newOrderedRules = newIds.map((id) => rules.find((r) => r.id === id)!);
+    setRules(newOrderedRules);
   };
 
   return (
     <div className="p-4">
-      <h2 className="text-lg font-semibold mb-2"> Prioritize Rules</h2>
+      <h2 className="text-lg font-semibold mb-2">Prioritize Rules</h2>
       <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext items={orderedIds} strategy={verticalListSortingStrategy}>
           {orderedIds.map((id) => {
