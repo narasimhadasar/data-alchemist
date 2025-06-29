@@ -5,13 +5,19 @@ import { saveAs } from "file-saver";
 
 function toCSV(data: unknown[]) {
   if (!data.length) return "";
-  const keys = Object.keys(data[0]);
+
+  // Narrow type
+  const firstRow = data[0] as Record<string, unknown>;
+  const keys = Object.keys(firstRow);
+
   const lines = [
-    keys.join(","),
-    ...data.map((row) =>
-      keys.map((k) => JSON.stringify(row[k] ?? "")).join(",")
-    ),
+    keys.join(","), // header
+    ...data.map((row) => {
+      const safeRow = row as Record<string, unknown>;
+      return keys.map((k) => JSON.stringify(safeRow[k] ?? "")).join(",");
+    }),
   ];
+
   return lines.join("\n");
 }
 
@@ -20,23 +26,22 @@ export default function ExportButton() {
 
   const handleExport = () => {
     // Export rules.json
-    const rulesBlob = new Blob(
-      [JSON.stringify(rules, null, 2)],
-      { type: "application/json" }
-    );
+    const rulesBlob = new Blob([JSON.stringify(rules, null, 2)], {
+      type: "application/json",
+    });
     saveAs(rulesBlob, "rules.json");
 
-    // Export clients.csv
-    const clientsCSV = toCSV(data.clients);
-    saveAs(new Blob([clientsCSV], { type: "text/csv" }), "clients.csv");
+    // Export each dataset as CSV
+    const exportData = [
+      { filename: "clients.csv", content: toCSV(data.clients) },
+      { filename: "workers.csv", content: toCSV(data.workers) },
+      { filename: "tasks.csv", content: toCSV(data.tasks) },
+    ];
 
-    // Export workers.csv
-    const workersCSV = toCSV(data.workers);
-    saveAs(new Blob([workersCSV], { type: "text/csv" }), "workers.csv");
-
-    // Export tasks.csv
-    const tasksCSV = toCSV(data.tasks);
-    saveAs(new Blob([tasksCSV], { type: "text/csv" }), "tasks.csv");
+    exportData.forEach(({ filename, content }) => {
+      const blob = new Blob([content], { type: "text/csv" });
+      saveAs(blob, filename);
+    });
   };
 
   return (
@@ -45,8 +50,7 @@ export default function ExportButton() {
         onClick={handleExport}
         className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
       >
-         Export Cleaned Data 
-         & Rules
+        Export Cleaned Data & Rules
       </button>
     </div>
   );
