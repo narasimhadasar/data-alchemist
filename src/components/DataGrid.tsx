@@ -2,8 +2,8 @@
 import { useState } from "react";
 
 type DataGridProps = {
-  data: Record<string, any>[];
-  onEdit: (rowIndex: number, field: string, value: any) => void;
+  data: Record<string, unknown>[];
+  onEdit: (rowIndex: number, field: string, value: unknown) => void;
 };
 
 export default function DataGrid({ data, onEdit }: DataGridProps) {
