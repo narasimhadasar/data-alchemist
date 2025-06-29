@@ -44,7 +44,7 @@ export default function RulePrioritization() {
     setOrderedIds(rules.map((r) => r.id));
   }, [rules]);
 
-  const handleDragEnd = (event: any) => {
+  const handleDragEnd = (event: unknown) => {
     const { active, over } = event;
     if (active.id !== over.id) {
       const oldIndex = orderedIds.indexOf(active.id);
