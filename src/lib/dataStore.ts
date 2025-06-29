@@ -7,15 +7,15 @@ export interface Rule {
   id: string;
   entity: "clients" | "workers" | "tasks";
   field: string;
-  validate: (value: any, row: any, fullData: any) => string | null;
+  validate: (value: unknown, row: unknown, fullData: unknown) => string | null;
   message: string;
   active: boolean;
   weight?: number;
 }
 
-type Client = Record<string, any>;
-type Worker = Record<string, any>;
-type Task = Record<string, any>;
+type Client = Record<string, unknown>;
+type Worker = Record<string, unknown>;
+type Task = Record<string, unknown>;
 
 interface DataStore {
   data: {
@@ -30,7 +30,7 @@ interface DataStore {
   };
   errors: ValidationError[];
   rules: Rule[];
-  setData: (section: keyof DataStore["data"], value: any[]) => void;
+  setData: (section: keyof DataStore["data"], value: unknown[]) => void;
   setValid: (section: keyof DataStore["valid"], value: boolean) => void;
   setRules: (rules: Rule[]) => void;
   addRule: (rule: Rule) => void;
