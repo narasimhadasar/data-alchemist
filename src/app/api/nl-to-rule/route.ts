@@ -56,12 +56,12 @@ Return a JSON object with the following keys:
     try {
       rule = JSON.parse(content);
     } catch (e) {
-      console.error("Parsing error:", content);
+      console.error("Parsing error:", e, content);
       return NextResponse.json({ error: "AI response is not valid JSON." }, { status: 500 });
     }
 
     return NextResponse.json({ rule });
-  } catch (err: any) {
+  } catch (err: unknown) {
     return NextResponse.json(
       { error: "Rule conversion failed", details: err.message },
       { status: 500 }
