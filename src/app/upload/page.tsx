@@ -20,7 +20,7 @@ import {
   taskHeaderMap,
 } from "@/utils/headerMapper";
 
-type Row = Record<string, any>;
+type Row = Record<string, unknown>;
 
 export default function UploadPage() {
   const [files, setFiles] = useState<File[]>([]);
