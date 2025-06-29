@@ -69,7 +69,7 @@ export default function RuleInput() {
       {/* Natural Language Rule Input */}
       <div className="border border-gray-300 p-4 rounded bg-gray-50">
         <label className="block font-medium text-sm mb-1">
-          🧠 Add a Rule in Natural Language
+           Add a Rule in Natural Language
         </label>
         <textarea
           value={nlText}
@@ -91,14 +91,14 @@ export default function RuleInput() {
       <div className="border border-yellow-400 bg-yellow-50 p-4 rounded">
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-medium mb-1 text-yellow-900">
-            💡 AI Rule Suggestions
+             AI Rule Suggestions
           </h3>
           <button
             onClick={loadSuggestions}
             disabled={suggestionLoading}
             className="text-xs bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600"
           >
-            {suggestionLoading ? "Regenerating..." : "🔁 Regenerate"}
+            {suggestionLoading ? "Regenerating..." : " Regenerate"}
           </button>
         </div>
         {suggestionLoading ? (
@@ -112,7 +112,7 @@ export default function RuleInput() {
                   onClick={() => handleConvertRule(s)}
                   className="text-xs bg-blue-500 text-white px-2 py-0.5 rounded hover:bg-blue-600"
                 >
-                  ➕ Add
+                   Add
                 </button>
               </li>
             ))}
@@ -120,25 +120,36 @@ export default function RuleInput() {
         )}
       </div>
 
-      {/* Preset Profile Selector */}
-      <div className="flex items-center justify-between mb-2">
-        <h2 className="text-lg font-semibold">Validation Rules</h2>
-        <select
-          onChange={(e) => {
-            const selected = e.target.value;
-            if (profiles[selected]) {
-              setRules(profiles[selected]);
-            }
-          }}
-          className="border px-2 py-1 rounded text-sm"
-        >
-          <option value="">Load Preset Profile</option>
-          {Object.keys(profiles).map((profile) => (
-            <option key={profile} value={profile}>
-              {profile}
-            </option>
-          ))}
-        </select>
+      {/* Preset Profile Selector + Reset Button */}
+      <div className="flex items-center justify-between mb-2 gap-4">
+        <div>
+          <h2 className="text-lg font-semibold">Validation Rules</h2>
+        </div>
+        <div className="flex gap-3">
+          <select
+            onChange={(e) => {
+              const selected = e.target.value;
+              if (profiles[selected]) {
+                setRules(profiles[selected]);
+              }
+            }}
+            className="border px-2 py-1 rounded text-sm"
+          >
+            <option value="">Load Preset Profile</option>
+            {Object.keys(profiles).map((profile) => (
+              <option key={profile} value={profile}>
+                {profile}
+              </option>
+            ))}
+          </select>
+
+          <button
+            onClick={handleResetToDefault}
+            className="px-3 py-1 text-sm bg-gray-200 hover:bg-gray-300 rounded"
+          >
+             Reset to Default
+          </button>
+        </div>
       </div>
 
       {/* Rule Cards */}
