@@ -24,7 +24,7 @@ export async function convertNlToRule(nlText: string): Promise<Rule | null> {
         // Use arrow function wrapper to avoid "Function statements require a function name" error
         const fnBody = rule.validate.trim().replace(/^function\s*\([^\)]*\)\s*{/, "").replace(/}$/, "");
         rule.validate = new Function("value", "row", "fullData", fnBody);
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error(" Failed to create validate function:", err.message);
         return null;
       }
@@ -32,7 +32,7 @@ export async function convertNlToRule(nlText: string): Promise<Rule | null> {
 
     rule.id = uuidv4();
     return rule as Rule;
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error(" convertNlToRule (frontend) failed:", err.message);
     return null;
   }
