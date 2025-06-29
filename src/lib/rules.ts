@@ -3,7 +3,7 @@ export type Rule = {
   entity: "clients" | "workers" | "tasks";
   field: string;
   message: string;
-  test: (value: any, row: Record<string, any>, all: Record<string, any>[]) => boolean;
+  test: (value: unknown, row: Record<string, unknown>, all: Record<string, unknown>[]) => boolean;
   severity?: "error" | "warning";
 };
 
