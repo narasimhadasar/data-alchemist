@@ -1,3 +1,3 @@
 // src/lib/types.ts
 
-export type Row = Record<string, any>;
+export type Row = Record<string, unknown>;
