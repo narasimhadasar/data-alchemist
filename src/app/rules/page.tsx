@@ -19,7 +19,7 @@ export default function RuleEditorPage() {
     if (rules.length === 0) {
       setRules(defaultRules);
     }
-  }, [rules.length]);
+  }, [rules.length, setRules]);
 
   const handleRevalidate = () => {
     revalidate();
@@ -34,7 +34,7 @@ export default function RuleEditorPage() {
 
   return (
     <div className="p-6 space-y-6">
-      {/*  Header: Title + Grid Button */}
+      {/* Header with title and button */}
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold"> Rule Configuration</h1>
         <Link href="/grid">
@@ -44,10 +44,8 @@ export default function RuleEditorPage() {
         </Link>
       </div>
 
-      {/*  Rule Input */}
       <RuleInput />
 
-      {/*  Re-Validate Button */}
       <button
         onClick={handleRevalidate}
         className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
@@ -55,7 +53,6 @@ export default function RuleEditorPage() {
         Re-Validate Data
       </button>
 
-      {/*  Validation Errors Section */}
       <div ref={validationRef}>
         {sortedErrors.length > 0 ? (
           <div className="bg-red-50 border border-red-300 text-red-800 p-4 rounded-md mt-6">
@@ -65,7 +62,9 @@ export default function RuleEditorPage() {
                 <li key={idx}>
                   <strong>{err.entity}</strong> [Row {err.row + 1}] <em>{err.field}</em>: {err.message}
                   {typeof err.weight !== "undefined" && (
-                    <span className="ml-2 text-xs text-gray-600">(Weight: {err.weight})</span>
+                    <span className="text-xs text-gray-600 ml-2">
+                      (Weight: {err.weight})
+                    </span>
                   )}
                 </li>
               ))}
