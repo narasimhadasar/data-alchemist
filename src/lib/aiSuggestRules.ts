@@ -1,4 +1,3 @@
-// src/lib/aiSuggestRules.ts
 import { useDataStore } from "./dataStore";
 
 export async function fetchRuleSuggestions(): Promise<string[]> {
@@ -12,6 +11,7 @@ export async function fetchRuleSuggestions(): Promise<string[]> {
     });
 
     const json = await res.json();
+
     if (!res.ok) {
       console.error("❌ Suggestion failed:", json);
       return [];
@@ -19,7 +19,11 @@ export async function fetchRuleSuggestions(): Promise<string[]> {
 
     return json.suggestions || [];
   } catch (err: unknown) {
-    console.error("❌ fetchRuleSuggestions failed:", err.message);
+    if (err instanceof Error) {
+      console.error("❌ fetchRuleSuggestions failed:", err.message);
+    } else {
+      console.error("❌ fetchRuleSuggestions failed with unknown error:", err);
+    }
     return [];
   }
 }
