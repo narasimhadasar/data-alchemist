@@ -3,7 +3,7 @@
 import { useDataStore } from "@/lib/dataStore";
 import { saveAs } from "file-saver";
 
-function toCSV(data: any[]) {
+function toCSV(data: unknown[]) {
   if (!data.length) return "";
   const keys = Object.keys(data[0]);
   const lines = [
